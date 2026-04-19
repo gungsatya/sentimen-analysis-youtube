@@ -1,0 +1,10 @@
+gradio 
+youtube-comment-downloader 
+transformers 
+pandas 
+torch
+nltk 
+Sastrawi
+scikit-learn 
+matplotlib
+emoji
