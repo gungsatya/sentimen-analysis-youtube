@@ -1,3 +1,5 @@
+tensorflow
+tf_keras
 gradio 
 youtube-comment-downloader 
 transformers 
@@ -8,3 +10,5 @@ Sastrawi
 scikit-learn 
 matplotlib
 emoji
+numpy
+tqdm

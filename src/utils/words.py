@@ -2,10 +2,19 @@ import re
 import os
 import csv
 import emoji
+import pickle
+import tensorflow as tf
+import numpy as np
+import pandas as pd
+import tf_keras
+
+from tf_keras.preprocessing.sequence import pad_sequences
 from nltk.tokenize import word_tokenize
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from transformers import pipeline
+
+from config import root_dir
 
 # Menggunakan model yang sudah di-fine-tune untuk sentimen Indonesia
 # Gunakan model yang sudah terbukti bisa di-load
@@ -137,3 +146,24 @@ def analyze_sentiment(text):
     except Exception as e:
         print(f"Error during sentiment analysis: {e}")
         return "Netral", 0.0
+
+# Load di script baru
+model = tf_keras.models.load_model(os.path.join(root_dir, "models\\model_emosi_fasttext.h5"))
+with open(os.path.join(root_dir, "models\\tokenizer.pickle"), "rb") as h:
+    tokenizer = pickle.load(h)
+
+file_path =  os.path.join(root_dir,"data\\Twitter_Emotion_Dataset.csv")
+
+# 1. Load Dataset
+df = pd.read_csv(file_path)
+
+# Urutan label sesuai pd.get_dummies(df['label'])
+# Penting: Pastikan urutan ini sama dengan urutan kolom di Y saat training
+labels = sorted(df['label'].unique()) 
+
+def predict_emotion(text):
+    clean = clean_text(text)
+    seq = tokenizer.texts_to_sequences([clean])
+    pad = pad_sequences(seq, maxlen=50)
+    res = model.predict(pad, verbose=0)
+    return labels[np.argmax(res)]
